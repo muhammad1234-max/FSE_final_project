@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="bi bi-truck me-2"></i>Suppliers</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('store.add_supplier') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Add New Supplier
+            </a>
+        </div>
+    </div>
+
+    {% if suppliers %}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Contact Person</th>
+                            <th>Contact Number</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for supplier in suppliers %}
+                        <tr>
+                            <td>{{ supplier.name }}</td>
+                            <td>{{ supplier.contact_person }}</td>
+                            <td>{{ supplier.contact_number }}</td>
+                            <td>{{ supplier.email }}</td>
+                            <td>
+                                <a href="{{ url_for('store.edit_supplier', supplier_id=supplier.id) }}" class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="{{ url_for('store.view_supplier', supplier_id=supplier.id) }}" class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>No suppliers found. Please add a supplier.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

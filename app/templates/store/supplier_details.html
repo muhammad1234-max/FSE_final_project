@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2><i class="bi bi-truck me-2"></i>Supplier Details</h2>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{{ url_for('store.edit_supplier', supplier_id=supplier.id) }}" class="btn btn-primary">
+                <i class="bi bi-pencil me-2"></i>Edit Supplier
+            </a>
+            <a href="{{ url_for('store.suppliers') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Suppliers
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Contact Information</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row">
+                        <dt class="col-sm-4">Name</dt>
+                        <dd class="col-sm-8">{{ supplier.name }}</dd>
+
+                        <dt class="col-sm-4">Contact Person</dt>
+                        <dd class="col-sm-8">{{ supplier.contact_person }}</dd>
+
+                        <dt class="col-sm-4">Contact Number</dt>
+                        <dd class="col-sm-8">{{ supplier.contact_number }}</dd>
+
+                        <dt class="col-sm-4">Email</dt>
+                        <dd class="col-sm-8">{{ supplier.email }}</dd>
+
+                        <dt class="col-sm-4">Address</dt>
+                        <dd class="col-sm-8">{{ supplier.address }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Supplied Items</h5>
+                </div>
+                <div class="card-body">
+                    {% if supplier.inventory_items %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th>Category</th>
+                                    <th>Stock</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in supplier.inventory_items %}
+                                <tr>
+                                    <td>{{ item.item_name }}</td>
+                                    <td>{{ item.category }}</td>
+                                    <td>{{ item.stock_quantity }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No items supplied by this supplier.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Order History</h5>
+                </div>
+                <div class="card-body">
+                    {% if supplier.orders %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Total Amount</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in supplier.orders %}
+                                <tr>
+                                    <td>#{{ order.id }}</td>
+                                    <td>{{ order.order_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if order.status == 'delivered' else 'warning' if order.status == 'pending' else 'danger' }}">
+                                            {{ order.status }}
+                                        </span>
+                                    </td>
+                                    <td>${{ "%.2f"|format(order.total_amount) }}</td>
+                                    <td>
+                                        <a href="{{ url_for('store.order_details', order_id=order.id) }}" class="btn btn-sm btn-outline-info">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No orders found for this supplier.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

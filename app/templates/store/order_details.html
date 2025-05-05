@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="bi bi-clipboard-check me-2"></i>Order Details</h2>
+        </div>
+        <div class="col text-end">
+            <a href="{{ url_for('store.orders') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Orders
+            </a>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Order Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th style="width: 40%">Order ID:</th>
+                            <td>#{{ order.id }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date:</th>
+                            <td>{{ order.order_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        </tr>
+                        <tr>
+                            <th>Status:</th>
+                            <td>
+                                <span class="badge bg-{% if order.status == 'pending' %}warning{% elif order.status == 'delivered' %}success{% elif order.status == 'cancelled' %}danger{% endif %}">
+                                    {{ order.status|title }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Total Amount:</th>
+                            <td>${{ order.total_amount|round(2) }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Supplier Information</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tr>
+                            <th style="width: 40%">Name:</th>
+                            <td>{{ order.supplier.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Contact Person:</th>
+                            <td>{{ order.supplier.contact_person }}</td>
+                        </tr>
+                        <tr>
+                            <th>Contact Number:</th>
+                            <td>{{ order.supplier.contact_number }}</td>
+                        </tr>
+                        <tr>
+                            <th>Email:</th>
+                            <td>{{ order.supplier.email }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if order.status == 'pending' %}
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Update Order Status</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('store.update_order_status', order_id=order.id) }}" class="d-flex gap-2">
+                        <select name="status" class="form-select" style="max-width: 200px;">
+                            <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary">Update Status</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-header bg-light">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h5 class="mb-0">Order Items</h5>
+                </div>
+                {% if order.status == 'pending' %}
+                <div class="col text-end">
+                    <a href="{{ url_for('store.add_order_item', order_id=order.id) }}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus-lg me-2"></i>Add Item
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-body">
+            {% if order.order_items %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Item</th>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.order_items %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{ item.inventory.item_name }}</td>
+                            <td>{{ item.inventory.category }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>${{ item.unit_price|round(2) }}</td>
+                            <td>${{ (item.quantity * item.unit_price)|round(2) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="5" class="text-end">Total:</th>
+                            <th>${{ order.total_amount|round(2) }}</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>No items in this order. 
+                {% if order.status == 'pending' %}
+                <a href="{{ url_for('store.add_order_item', order_id=order.id) }}">Add items</a>.
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if order.notes %}
+    <div class="card mt-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Notes</h5>
+        </div>
+        <div class="card-body">
+            <p>{{ order.notes }}</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
